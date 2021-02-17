@@ -1,0 +1,2 @@
+link data: https://dblp.uni-trier.de/xml/
+thông tin các trường trong file dbpl.xml: https://dblp.org/faq/16154937.html
