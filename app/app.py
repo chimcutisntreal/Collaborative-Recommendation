@@ -107,6 +107,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
         self.ui.btSearchP1.clicked.connect(self.getAuthorFromAuthor)
 
+        # page 1 new: nhom cong tac tuong tu nhat new
+        self.ui.btTabNhomNguoiCongTacNew.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhatNew))
+        self.ui.btSearchP1New.clicked.connect(self.getAuthorFromAuthorNew)
+
         # page 2: cong tac tuong tu nhat
         self.ui.btNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pCongTacTuongTuNhat))
         self.ui.btSearchP2.clicked.connect(self.getAuthorFromGroupAuthor)
@@ -217,6 +221,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     item_uploaded = QListWidgetItem(df_key)
                     self.ui.lstUploaded.addItem(item_uploaded)
                     self.ui.cbChooseTarget_1.addItem(df_key)
+                    self.ui.cbChooseSource_1_new.addItem(df_key)
+                    self.ui.cbChooseTarget_1_new.addItem(df_key)
                     self.ui.cbChooseTarget_2.addItem(df_key)
                     self.ui.cbChooseTarget_3.addItem(df_key)
                 else:
@@ -332,6 +338,38 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.tblP1.setItem(i, 1, QTableWidgetItem(str(df_author_name.index[i])))
                     self.ui.tblP1.setItem(i, 2, QTableWidgetItem(str(np.round(df_author_name.iloc[i, 0], 4))))
                 self.ui.lbSearchP1.setVisible(False)
+
+            else:
+                self.raise_notice(text="Tên cộng tác viên không tồn tại")
+
+    # Tìm kiếm các tác giả công tác xuôi new
+    def getAuthorFromAuthorNew(self):
+        df_key_source = str(self.ui.cbChooseSource_1_new.currentText())
+        df_key_target = str(self.ui.cbChooseTarget_1_new.currentText())
+        if not df_key_source or not df_key_target:
+            self.raise_notice(text='no_key')
+        elif (df_key_target and self.author_vt[df_key_target].empty) or (df_key_source and self.author_vt[df_key_source].empty):
+            self.raise_notice(text='no_data')
+        else:
+            name_authors = self.author_vt[df_key_target].columns
+            author_name = self.ui.lTacGiaP1New.text()
+            if author_name not in self.author_vt[df_key_source].columns:
+                self.raise_notice(text="Không tìm thấy tác giả từ dữ liệu đích!")
+                return
+            if author_name in name_authors:
+                self.ui.lbSearchP1New.setVisible(True)
+                self.ui.lbSearchP1New.repaint()
+
+                df_author_name = cosine_similar(self.author_vt[df_key_target], author_name, 10)
+                row = 0
+                self.ui.tblP1New.setRowCount(df_author_name.shape[0])
+                for i in range(df_author_name.shape[0]):
+                    item = dict(df_author_name.iloc[i, :])
+                    print(item)
+                    self.ui.tblP1New.setItem(i, 0, QTableWidgetItem(str(i+1)))
+                    self.ui.tblP1New.setItem(i, 1, QTableWidgetItem(str(df_author_name.index[i])))
+                    self.ui.tblP1New.setItem(i, 2, QTableWidgetItem(str(np.round(df_author_name.iloc[i, 0], 4))))
+                self.ui.lbSearchP1New.setVisible(False)
 
             else:
                 self.raise_notice(text="Tên cộng tác viên không tồn tại")
