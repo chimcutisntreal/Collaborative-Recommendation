@@ -17,10 +17,9 @@ with open('config.json') as json_file:
 
 PATH_MAIN_DATA = config["PATH_MAIN_DATA"]
 PATH_CUSTOM_DATA = config["PATH_CUSTOM_DATA"]
+PATH_DTD = config["PATH_DTD"]
+PATH_XML_TO_CSV = config["PATH_XML_TO_CSV"]
 #PATH_RECCOMENT_DATA = config["PATH_RECCOMENT_DATA"]
-
-
-
 
 # def twodata_consine_similar(author, author_name, top):
 #     consine = {}
@@ -72,6 +71,7 @@ def group_cosine_similar(author_vt, group_author_vector, authors_name, top):
     
     return df_cosine
 
+
 class NewWidgetPopup(QtWidgets.QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -84,6 +84,7 @@ class NewWidgetPopup(QtWidgets.QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
+
 class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
@@ -91,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        #4 biến này phục vụ cho việc phân trang
+        # 4 biến này phục vụ cho việc phân trang
         self.nextP3 = 10
         self.reVertP3 = 0
         self.nextP4 = 10
@@ -106,7 +107,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.author_vt_rcm = None
         self.df_rcm = None 
 
-        self.df_main = None #biến để lưu bộ dữ liệu đầy đủ (bộ dữ liệu để tìm kiếm trong việc thêm tác giả mới)
+        self.df_main = None # biến để lưu bộ dữ liệu đầy đủ (bộ dữ liệu để tìm kiếm trong việc thêm tác giả mới)
         self.all_author_list = set()
 
         # page 0: Import data
@@ -201,11 +202,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def load(self):
         path_data = self.ui.lblPath.text()
+        is_xml = False
         if path_data.endswith('.xml'):
             output_name = path_data.split('/').pop().split('.')[0] + '.csv'
-            output_path = path.join(os.getcwd(), f'data_converted/{output_name}')
-            xml_to_csv(path_data, '/Users/chutrieuchinh/Downloads/dbpl2/data/dblp.dtd', output_path)
+            output_path = path.join(PATH_XML_TO_CSV, output_name)
+            # abs_dtd_path = os.path.abspath(PATH_DTD)
+            xml_to_csv(path_data, PATH_DTD, output_path)
             path_data = output_path
+            is_xml = True
         if path.exists(path_data):
             self.ui.lbLoad.setText("Đang tải dữ liệu... !")
             self.ui.lbLoad.setVisible(True)
@@ -215,7 +219,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 df_key = path_data.split('/').pop()
                 if df_key not in self.list_df_name:
                     self.list_df_name.append(df_key)
-                    self.df[df_key] = pd.read_csv(path_data, encoding='latin1')
+                    if is_xml:
+                        self.df[df_key] = pd.read_csv(path_data, encoding='latin1', error_bad_lines=False, sep=';')
+                    else:
+                        self.df[df_key] = pd.read_csv(path_data, encoding='latin1', error_bad_lines=False)
                 #    self.df.drop_duplicates(keep=True,inplace=True)
                     self.df[df_key].reset_index(inplace=True)
                     df_author = self.df[df_key][['author']]

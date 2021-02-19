@@ -95,7 +95,7 @@ def open_outputfiles(elements: set, element_attributes: dict, output_filename: s
         if fieldnames is not None and len(fieldnames) > 0:
             fieldnames = sorted(list(fieldnames))
             fieldnames.insert(0, 'id')
-            output_path = '%s_%s%s' % (path, element, ext)
+            output_path = '%s%s' % (path, ext)
             output_file = open(output_path, mode='w', encoding='UTF-8')
             output_writer = csv.DictWriter(output_file, fieldnames=fieldnames, delimiter=';',
                                            quoting=csv.QUOTE_MINIMAL, quotechar='"', doublequote=True,
@@ -104,7 +104,6 @@ def open_outputfiles(elements: set, element_attributes: dict, output_filename: s
                 output_writer.writeheader()
             output_files[element] = output_writer
     return output_files
-
 
 def get_element_attributes(xml_file, elements: set) -> dict:
     context = etree.iterparse(xml_file, dtd_validation=True, events=('start', 'end'), attribute_defaults=True,
