@@ -113,13 +113,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btTabImportData.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pImportData))
         self.ui.btChoose.clicked.connect(self.choose_path)
         self.ui.btLoad.clicked.connect(self.load)
-        self.ui.lblPath.setText("/Users/chutrieuchinh/Documents/pyqt5/data/output_article_10k copy.csv")
 
         # page 1: nhom cong tac tuong tu nhat
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
         self.ui.tblP1.cellDoubleClicked.connect(self.show_item)
         self.ui.btSearchP1.clicked.connect(self.getAuthorFromAuthor)
-
 
         # page 1 new: nhom cong tac tuong tu nhat new
         self.ui.btTabNhomNguoiCongTacNew.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhatNew))
