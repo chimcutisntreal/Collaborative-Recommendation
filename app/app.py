@@ -72,6 +72,17 @@ def group_cosine_similar(author_vt, group_author_vector, authors_name, top):
     
     return df_cosine
 
+class NewWidgetPopup(QtWidgets.QMainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+
+        self.title = "Table"
+        self.top = 150
+        self.left = 300
+        self.width = 870
+        self.height = 500
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -138,6 +149,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_item(self):
         print(f'row {self.ui.tblP1.currentRow()}')
         print(f'column {self.ui.tblP1.currentColumn()}')
+
+        self.newWidget = NewWidgetPopup()
+        self.newWidget.show()
 
     # lấy Danh sách tác giả từ dữ liệu mới
     def getListNewPaper(self, flag):
