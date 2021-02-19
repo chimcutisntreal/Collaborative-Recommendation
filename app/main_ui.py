@@ -324,7 +324,7 @@ class Ui_MainWindow(object):
         self.widget_2.setObjectName("widget_2")
 
         self.cbChooseTarget_2 = QtWidgets.QComboBox(self.widget_2)
-        self.cbChooseTarget_2.setGeometry(QtCore.QRect(170, 32, 221, 21))
+        self.cbChooseTarget_2.setGeometry(QtCore.QRect(156, 32, 200, 21))
         self.cbChooseTarget_2.setObjectName("cbChooseTarget_2")
         self.lblChooseTarget_2 = QtWidgets.QLabel(self.widget_2)
         self.lblChooseTarget_2.setGeometry(QtCore.QRect(40, 35, 111, 16))
@@ -472,14 +472,25 @@ class Ui_MainWindow(object):
         self.widget_3.setObjectName("widget_3")
 
         self.cbChooseTarget_3 = QtWidgets.QComboBox(self.widget_3)
-        self.cbChooseTarget_3.setGeometry(QtCore.QRect(770, 27, 221, 21))
+        self.cbChooseTarget_3.setGeometry(QtCore.QRect(145, 27, 221, 21))
         self.cbChooseTarget_3.setObjectName("cbChooseTarget_3")
         self.lblChooseTarget_3 = QtWidgets.QLabel(self.widget_3)
-        self.lblChooseTarget_3.setGeometry(QtCore.QRect(650, 30, 111, 16))
+        self.lblChooseTarget_3.setGeometry(QtCore.QRect(20, 30, 111, 16))
         self.lblChooseTarget_3.setObjectName("lblChooseTarget_3")
 
+        self.cbSearchType_3 = QtWidgets.QComboBox(self.widget_3)
+        self.cbSearchType_3.setGeometry(QtCore.QRect(145, 72, 221, 21))
+        self.cbSearchType_3.setObjectName("cbSearchType_3")
+        self.lblSearchType_3 = QtWidgets.QLabel(self.widget_3)
+        self.lblSearchType_3.setGeometry(QtCore.QRect(20, 75, 115, 16))
+        self.lblSearchType_3.setObjectName("lblSearchType_3")
+
+        self.lSearchP3 = QtWidgets.QLineEdit(self.widget_3)
+        self.lSearchP3.setGeometry(QtCore.QRect(700, 75, 220, 21))
+        self.lSearchP3.setObjectName("lSearchP3")
+
         self.tblP3 = QtWidgets.QTableWidget(self.widget_3)
-        self.tblP3.setGeometry(QtCore.QRect(20, 130, 1121, 421))
+        self.tblP3.setGeometry(QtCore.QRect(20, 150, 1121, 421))
         self.tblP3.setObjectName("tblP3")
         self.tblP3.setColumnCount(3)
         self.tblP3.setRowCount(0)
@@ -497,7 +508,7 @@ class Ui_MainWindow(object):
         self.tblP3.setColumnWidth(2, 500)
 
         self.label_15 = QtWidgets.QLabel(self.widget_3)
-        self.label_15.setGeometry(QtCore.QRect(20, 20, 391, 41))
+        self.label_15.setGeometry(QtCore.QRect(20, 100, 391, 41))
         font = QtGui.QFont()
         font.setPointSize(15)
         font.setBold(True)
@@ -505,13 +516,13 @@ class Ui_MainWindow(object):
         self.label_15.setFont(font)
         self.label_15.setObjectName("label_15")
         self.btShowP3 = QtWidgets.QPushButton(self.widget_3)
-        self.btShowP3.setGeometry(QtCore.QRect(20, 80, 75, 23))
+        self.btShowP3.setGeometry(QtCore.QRect(940, 75, 81, 23))
         self.btShowP3.setObjectName("btShowP3")
         self.btRevertP3 = QtWidgets.QPushButton(self.widget_3)
-        self.btRevertP3.setGeometry(QtCore.QRect(940, 570, 81, 23))
+        self.btRevertP3.setGeometry(QtCore.QRect(940, 580, 81, 23))
         self.btRevertP3.setObjectName("btRevertP3")
         self.btNextP3 = QtWidgets.QPushButton(self.widget_3)
-        self.btNextP3.setGeometry(QtCore.QRect(1060, 570, 81, 23))
+        self.btNextP3.setGeometry(QtCore.QRect(1060, 580, 81, 23))
         self.btNextP3.setObjectName("btNextP3")
         self.stackedWidget.addWidget(self.pDnhachBaiBao)
 
@@ -598,7 +609,6 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
 
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "ỨNG DỤNG KHUYẾN NGHỊ CỘNG TÁC"))
@@ -681,6 +691,10 @@ class Ui_MainWindow(object):
         item = self.tblP3.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Các tác giả"))
         self.lblChooseTarget_3.setText(_translate("MainWindow", "Chọn dữ liệu đích"))
+        self.lblSearchType_3.setText(_translate("MainWindow", "Chọn kiểu tìm kiếm"))
+        self.lSearchP3.setPlaceholderText(_translate("MainWindow", "Nhập thông tin tìm kiếm"))
+        self.cbSearchType_3.addItem("Theo tên bài báo", 0)
+        self.cbSearchType_3.addItem("Theo tác giả", 1)
         self.label_15.setText(_translate("MainWindow", "Danh sách các bài báo:"))
         self.btShowP3.setText(_translate("MainWindow", "Hiển thị"))
         self.btRevertP3.setText(_translate("MainWindow", "Lùi"))

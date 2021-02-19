@@ -113,6 +113,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btTabImportData.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pImportData))
         self.ui.btChoose.clicked.connect(self.choose_path)
         self.ui.btLoad.clicked.connect(self.load)
+        self.ui.lblPath.setText("/Users/trinh.chutrieu/Desktop/pyqt5/data/output_article_10k copy.csv")
 
         # page 1: nhom cong tac tuong tu nhat
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
@@ -457,14 +458,37 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.raise_notice(text="Phải có ít nhất một tác giả trong nhóm cộng tác tồn tại")
 
-    # Lấy danh sách các bài báo từ bộ dữ liệu ban đầu(bộ dữ liệu để tìm kiếm cộng tác)
-    def getListPaper(self, flag):
+    def searchListPaper(self):
         df_key = str(self.ui.cbChooseTarget_3.currentText())
+        # search_type =
         if not df_key:
             self.raise_notice(text='no_key')
         elif df_key and self.df[df_key].empty:
             self.raise_notice(text='no_data')
         else:
+            current_df = self.df[df_key]
+            list_author = current_df.loc[current_df['author']]
+
+    # Lấy danh sách các bài báo từ bộ dữ liệu ban đầu(bộ dữ liệu để tìm kiếm cộng tác)
+    def getListPaper(self, flag):
+        df_key = str(self.ui.cbChooseTarget_3.currentText())
+        search_type = self.ui.cbSearchType_3.currentData()
+        search_data = str(self.ui.lSearchP3.text())
+        if not df_key:
+            self.raise_notice(text='no_key')
+        elif df_key and self.df[df_key].empty:
+            self.raise_notice(text='no_data')
+        else:
+            if bool(search_data):
+                if search_type == 0:
+                    pass
+                elif search_type == 1:
+                    current_df = self.df[df_key]
+                    current_author = [item.split('|') for item in current_df['author'].values.tolist()]
+                    new_df = current_df.replace({'author': current_author})
+                    print(new_df['author'])
+                    list_author = new_df.loc[search_data in new_df['author']]
+                    print(list_author)
             if flag == 1:
                 if self.nextP3 + 9 < self.df[df_key].shape[0]:
                     self.reVertP3 = self.reVertP3 + 10
