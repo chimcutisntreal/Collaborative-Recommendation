@@ -105,7 +105,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # page 1: nhom cong tac tuong tu nhat
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
+        self.ui.tblP1.cellDoubleClicked.connect(self.show_item)
         self.ui.btSearchP1.clicked.connect(self.getAuthorFromAuthor)
+
 
         # page 1 new: nhom cong tac tuong tu nhat new
         self.ui.btTabNhomNguoiCongTacNew.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhatNew))
@@ -132,6 +134,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btRevertP4.clicked.connect(partial(self.getListNewPaper, flag=2))
 
         self.show()
+
+    def show_item(self):
+        print(f'row {self.ui.tblP1.currentRow()}')
+        print(f'column {self.ui.tblP1.currentColumn()}')
 
     # lấy Danh sách tác giả từ dữ liệu mới
     def getListNewPaper(self, flag):

@@ -160,6 +160,7 @@ class Ui_MainWindow(object):
         self.tblP1.setGeometry(QtCore.QRect(20, 180, 1131, 401))
         
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tblP1.sizePolicy().hasHeightForWidth())
@@ -167,6 +168,7 @@ class Ui_MainWindow(object):
         self.tblP1.setMaximumSize(QtCore.QSize(1131, 401))
         font = QtGui.QFont()
         font.setKerning(True)
+        self.tblP1.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tblP1.setFont(font)
         self.tblP1.setMouseTracking(True)
         self.tblP1.setStyleSheet("selection-background-color: rgb(119, 162, 255);")
