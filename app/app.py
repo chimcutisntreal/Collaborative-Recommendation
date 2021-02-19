@@ -106,14 +106,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.author_vt_rcm = None
         self.df_rcm = None 
 
-        self.df_main = {} #biến để lưu bộ dữ liệu đầy đủ (bộ dữ liệu để tìm kiếm trong việc thêm tác giả mới)
-        self.all_author_list = {}
+        self.df_main = None #biến để lưu bộ dữ liệu đầy đủ (bộ dữ liệu để tìm kiếm trong việc thêm tác giả mới)
+        self.all_author_list = set()
 
         # page 0: Import data
         self.ui.btTabImportData.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pImportData))
         self.ui.btChoose.clicked.connect(self.choose_path)
         self.ui.btLoad.clicked.connect(self.load)
-        self.ui.lblPath.setText("/Users/trinh.chutrieu/Desktop/pyqt5/data/output_article_10k copy.csv")
+        self.ui.lblPath.setText("/Users/chutrieuchinh/Documents/pyqt5/data/output_article_10k copy.csv")
 
         # page 1: nhom cong tac tuong tu nhat
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
@@ -157,9 +157,9 @@ class MainWindow(QtWidgets.QMainWindow):
     # lấy Danh sách tác giả từ dữ liệu mới
     def getListNewPaper(self, flag):
         path_new_data = self.ui.lNewDBP4.text()
-        if path.exists(path_new_data) == False:
+        if not path.exists(path_new_data):
             path_new_data = PATH_CUSTOM_DATA
-            if path.exists(path_new_data) == False:
+            if not path.exists(path_new_data):
                 self.raise_notice(text="Không tồn tại dữ liệu trong :%s" % path_new_data)
                 return 0
         df_new = pd.read_csv(path_new_data, encoding='latin1')
@@ -271,6 +271,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     s = str(i).split('|')
                     for j in s:
                         self.all_author_list.add(j)
+                b = self.all_author_list
                 self.ui.lbLoadDataP4.setText("Nạp dữ liệu thành công !")
                 self.ui.lbLoadDataP4.setVisible(True)
             else:
@@ -458,50 +459,52 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.raise_notice(text="Phải có ít nhất một tác giả trong nhóm cộng tác tồn tại")
 
-    def searchListPaper(self):
-        df_key = str(self.ui.cbChooseTarget_3.currentText())
-        # search_type =
-        if not df_key:
-            self.raise_notice(text='no_key')
-        elif df_key and self.df[df_key].empty:
-            self.raise_notice(text='no_data')
-        else:
-            current_df = self.df[df_key]
-            list_author = current_df.loc[current_df['author']]
+    # def searchListPaper(self):
+    #     df_key = str(self.ui.cbChooseTarget_3.currentText())
+    #     # search_type =
+    #     if not df_key:
+    #         self.raise_notice(text='no_key')
+    #     elif df_key and self.df[df_key].empty:
+    #         self.raise_notice(text='no_data')
+    #     else:
+    #         current_df = self.df[df_key]
+    #         list_author = current_df.loc[current_df['author']]
 
     # Lấy danh sách các bài báo từ bộ dữ liệu ban đầu(bộ dữ liệu để tìm kiếm cộng tác)
     def getListPaper(self, flag):
         df_key = str(self.ui.cbChooseTarget_3.currentText())
         search_type = self.ui.cbSearchType_3.currentData()
         search_data = str(self.ui.lSearchP3.text())
+        self.ui.tblP3.clearContents()
         if not df_key:
             self.raise_notice(text='no_key')
         elif df_key and self.df[df_key].empty:
             self.raise_notice(text='no_data')
         else:
+            current_df = self.df[df_key]
             if bool(search_data):
                 if search_type == 0:
-                    pass
+                    current_df = current_df.loc[search_data == current_df['title']]
                 elif search_type == 1:
-                    current_df = self.df[df_key]
-                    current_author = [item.split('|') for item in current_df['author'].values.tolist()]
-                    new_df = current_df.replace({'author': current_author})
-                    print(new_df['author'])
-                    list_author = new_df.loc[search_data in new_df['author']]
-                    print(list_author)
+                    indexs = []
+                    a = current_df['author']
+                    for item in a.iteritems():
+                        if search_data in item[1].split('|'):
+                            indexs.append(item[0])
+                    current_df = current_df.iloc[indexs, :]
             if flag == 1:
-                if self.nextP3 + 9 < self.df[df_key].shape[0]:
+                if self.nextP3 + 9 < current_df.shape[0]:
                     self.reVertP3 = self.reVertP3 + 10
                     self.nextP3 = self.nextP3 + 10
 
-                elif self.nextP3 - self.df[df_key].shape[0] > -10 and self.reVertP3 + 10 < self.df[df_key].shape[0]:
+                elif self.nextP3 - current_df.shape[0] > -10 and self.reVertP3 + 10 < current_df.shape[0]:
                     self.reVertP3 = self.reVertP3 + 10
-                    self.nextP3 = self.df[df_key].shape[0]
+                    self.nextP3 = current_df.shape[0]
 
             elif flag == 2:
 
-                if self.nextP3 == self.df[df_key].shape[0]:
-                    self.nextP3 = self.nextP3 - (self.df[df_key].shape[0] - self.reVertP3)
+                if self.nextP3 == current_df.shape[0]:
+                    self.nextP3 = self.nextP3 - (current_df.shape[0] - self.reVertP3)
                     self.reVertP3 = self.reVertP3 - 10
 
                 elif self.reVertP3 - 10 >= 0:
@@ -512,7 +515,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.nextP3 = 10
 
             self.ui.tblP3.setRowCount(self.nextP3 - self.reVertP3)
-            papers = self.df[df_key].loc[self.reVertP3:self.nextP3, ("author", "title")].transpose()
+            papers = current_df.loc[self.reVertP3:self.nextP3, ("author", "title")].transpose()
 
             for i, _ in enumerate(papers):
                 self.ui.tblP3.setItem(i, 0, QTableWidgetItem(str(i + self.reVertP3)))

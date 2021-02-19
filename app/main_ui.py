@@ -500,6 +500,7 @@ class Ui_MainWindow(object):
         self.tblP3.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tblP3.setHorizontalHeaderItem(2, item)
+        self.tblP3.verticalHeader().setVisible(False)
         self.tblP3.horizontalHeader().setCascadingSectionResizes(True)
         self.tblP3.horizontalHeader().setSortIndicatorShown(False)
         self.tblP3.horizontalHeader().setStretchLastSection(True)
