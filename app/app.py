@@ -71,93 +71,6 @@ def group_cosine_similar(author_vt, group_author_vector, authors_name, top):
     
     return df_cosine
 
-
-class NewWidgetPopup(QtWidgets.QMainWindow):
-    def __init__(self):
-        QMainWindow.__init__(self)
-        self.setWindowTitle("List Paper")
-        self.setGeometry(300, 150, 800, 450)
-
-    def init_table(self, author_base, author_cell):
-        self.centralwidget_popup = QtWidgets.QWidget(self)
-        self.centralwidget_popup.setObjectName("centralwidget_popup")
-        self.centralwidget_popup.setStyleSheet("background-color: rgb(220, 220, 220);")
-        self.centralwidget_popup.setGeometry(QtCore.QRect(0, 0, 800, 450))
-
-        self.tblComparePaper = QtWidgets.QTableWidget(self.centralwidget_popup)
-        self.tblComparePaper.setEnabled(True)
-        self.tblComparePaper.setGeometry(QtCore.QRect(0, 0, 800, 450))
-
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.tblComparePaper.sizePolicy().hasHeightForWidth())
-        self.tblComparePaper.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setKerning(True)
-        self.tblComparePaper.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.tblComparePaper.setFont(font)
-        self.tblComparePaper.setMouseTracking(True)
-        self.tblComparePaper.setStyleSheet("selection-background-color: rgb(119, 162, 255);")
-        self.tblComparePaper.setDragEnabled(False)
-        self.tblComparePaper.setDragDropOverwriteMode(True)
-        self.tblComparePaper.setTextElideMode(QtCore.Qt.ElideRight)
-        self.tblComparePaper.setShowGrid(True)
-        self.tblComparePaper.setGridStyle(QtCore.Qt.SolidLine)
-        self.tblComparePaper.setWordWrap(True)
-        self.tblComparePaper.setCornerButtonEnabled(True)
-        self.tblComparePaper.setObjectName("tblComparePaper")
-        self.tblComparePaper.setColumnCount(3)
-        item = QtWidgets.QTableWidgetItem("STT")
-        self.tblComparePaper.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem(author_base)
-        self.tblComparePaper.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem(author_cell)
-        self.tblComparePaper.setHorizontalHeaderItem(2, item)
-        self.tblComparePaper.horizontalHeader().setVisible(True)
-        self.tblComparePaper.horizontalHeader().setCascadingSectionResizes(True)
-        self.tblComparePaper.horizontalHeader().setHighlightSections(True)
-        self.tblComparePaper.horizontalHeader().setMinimumSectionSize(90)
-        self.tblComparePaper.horizontalHeader().setSortIndicatorShown(False)
-        self.tblComparePaper.horizontalHeader().setStretchLastSection(True)
-        self.tblComparePaper.verticalHeader().setVisible(False)
-        self.tblComparePaper.verticalHeader().setCascadingSectionResizes(False)
-        self.tblComparePaper.verticalHeader().setHighlightSections(False)
-        self.tblComparePaper.verticalHeader().setMinimumSectionSize(23)
-        self.tblComparePaper.verticalHeader().setSortIndicatorShown(False)
-        self.tblComparePaper.verticalHeader().setStretchLastSection(False)
-        self.tblComparePaper.setColumnWidth(0, 80)
-        self.tblComparePaper.setColumnWidth(1, 360)
-        self.tblComparePaper.setColumnWidth(2, 360)
-        self.tblComparePaper.setItem(0, 0, QTableWidgetItem("abc"))
-
-    def generate_data(self, data):
-        self.tblComparePaper.clearContents()
-        if data:
-            df = data['df']
-            if data['list_paper']:
-                self.tblComparePaper.setRowCount(len(data['list_paper']))
-                for index, value in enumerate(data['list_paper']):
-                    self.tblComparePaper.setItem(index, 0, QTableWidgetItem(str(index+1)))
-                    self.tblComparePaper.setItem(index, 1, QTableWidgetItem(str(value)))
-                    self.tblComparePaper.setItem(index, 2, QTableWidgetItem(str(value)))
-            if data['list_id']:
-                df = df.loc[~df['id'].isin(data['list_id'])]
-            self.tblComparePaper.setRowCount(data['max_row'] + len(data['list_paper']))
-            index = index_1 = index_2 = len(data['list_paper'])
-            for _, row in df.iterrows():
-                self.tblComparePaper.setItem(index, 0, QTableWidgetItem(str(index + 1)))
-                author = str(row.author).split("|")
-                if data['author_base'] in author:
-                    self.tblComparePaper.setItem(index_1, 1, QTableWidgetItem(str(row.title)))
-                    index_1 += 1
-                elif data['author_cell'] in author:
-                    self.tblComparePaper.setItem(index_2, 2, QTableWidgetItem(str(row.title)))
-                    index_2 += 1
-                index += 1
-
-
 class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
@@ -191,16 +104,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # page 1: nhom cong tac tuong tu nhat
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
-        self.ui.tblP1.cellDoubleClicked.connect(self.show_item)
+        self.ui.tblP1.cellDoubleClicked.connect(partial(self.show_item, flag=0))
         self.ui.btSearchP1.clicked.connect(self.getAuthorFromAuthor)
 
         # page 1 new: nhom cong tac tuong tu nhat new
         self.ui.btTabNhomNguoiCongTacNew.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhatNew))
-        self.ui.tblP1New.cellDoubleClicked.connect(self.show_item_new)
+        self.ui.tblP1New.cellDoubleClicked.connect(partial(self.show_item, flag=1))
         self.ui.btSearchP1New.clicked.connect(self.getAuthorFromAuthorNew)
 
         # page 2: cong tac tuong tu nhat
         self.ui.btNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pCongTacTuongTuNhat))
+        self.ui.tblP2.cellDoubleClicked.connect(self.show_item_group)
         self.ui.btSearchP2.clicked.connect(self.getAuthorFromGroupAuthor)
 
         # page 3: danh sach bai bao
@@ -221,10 +135,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.show()
 
-    def show_item(self):
+    def show_item(self, flag):
         self.newWidget = NewWidgetPopup()
-
-        current_df = self.df[self.ui.cbChooseTarget_1.currentText()]
+        if flag == 0:
+            current_df = self.df[self.ui.cbChooseTarget_1.currentText()]
+        else:
+            current_df = self.df[self.ui.cbChooseTarget_1_new.currentText()]
         author_base = self.ui.lTacGiaP1.text()
         author_cell = self.ui.tblP1.currentItem().text()
         df_paper_base = self.filterPaperByAuthor(current_df, author_base)
@@ -238,7 +154,7 @@ class MainWindow(QtWidgets.QMainWindow):
             list_same_id = same_df['id'].values.tolist()
         data = {
             'max_row': max(len(df_paper_base.index), len(df_paper_cell.index)) - len(list_same_id),
-            'author_base': author_base,
+            'author_base': [author_base],
             'author_cell': author_cell,
             'df': merge_df,
             'list_paper': list_same_paper,
@@ -248,13 +164,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.newWidget.generate_data(data)
         self.newWidget.show()
 
-    def show_item_new(self):
+    def show_item_group(self):
         self.newWidget = NewWidgetPopup()
-        target_df = self.df[self.ui.cbChooseTarget_1_new.currentText()]
-        author_base = self.ui.lTacGiaP1New.text()
-        author_cell = self.ui.tblP1New.currentItem().text()
-        df_paper_base = self.filterPaperByAuthor(target_df, author_base)
-        df_paper_cell = self.filterPaperByAuthor(target_df, author_cell)
+        current_df = self.df[self.ui.cbChooseTarget_2.currentText()]
+        list_author = []
+        list_author.append(self.ui.lTacGia1.text())
+        list_author.append(self.ui.lTacGia2.text())
+        list_author.append(self.ui.lTacGia3.text())
+        list_author.append(self.ui.lTacGia4.text())
+        list_author.append(self.ui.lTacGia5.text())
+        list_author.append(self.ui.lTacGia6.text())
+        list_author.append(self.ui.lTacGia7.text())
+        list_author.append(self.ui.lTacGia8.text())
+        list_author.append(self.ui.lTacGia9.text())
+        list_author.append(self.ui.lTacGia10.text())
+        author_cell = self.ui.tblP2.currentItem().text()
+        df_paper_base = self.filterPaperByListAuthor(current_df, list_author)
+        df_paper_cell = self.filterPaperByAuthor(current_df, author_cell)
         merge_df = df_paper_base.append(df_paper_cell)
         same_df = merge_df[merge_df.duplicated(["title"])]
         list_same_paper = []
@@ -264,13 +190,13 @@ class MainWindow(QtWidgets.QMainWindow):
             list_same_id = same_df['id'].values.tolist()
         data = {
             'max_row': max(len(df_paper_base.index), len(df_paper_cell.index)) - len(list_same_id),
-            'author_base': author_base,
+            'author_base': list_author,
             'author_cell': author_cell,
             'df': merge_df,
             'list_paper': list_same_paper,
             'list_id': list_same_id
         }
-        self.newWidget.init_table(author_base, author_cell)
+        self.newWidget.init_table("Nhóm tác giả được khuyến nghị", author_cell)
         self.newWidget.generate_data(data)
         self.newWidget.show()
 
@@ -595,7 +521,7 @@ class MainWindow(QtWidgets.QMainWindow):
     #         current_df = self.df[df_key]
     #         list_author = current_df.loc[current_df['author']]
 
-    # Lọc bài báo theo tác giả
+    # Lọc bài báo theo 1 tác giả
     def filterPaperByAuthor(self, df, author):
         indexs = []
         authors = df['author']
@@ -606,6 +532,20 @@ class MainWindow(QtWidgets.QMainWindow):
         if not df.empty:
             return df
         self.raise_notice(text=f"Không tìm thấy bài báo với tác giả {author}")
+
+    # Lọc bài báo theo 1 tác giả
+    def filterPaperByListAuthor(self, df, list_author):
+        indexs = []
+        authors = df['author']
+        for item in authors.iteritems():
+            if isinstance(item[1], str) and any(i in item[1].split('|') for i in list_author):
+                indexs.append(item[0])
+        indexs = list(dict.fromkeys(indexs))
+        df = df.iloc[indexs, :]
+        if not df.empty:
+            return df
+        self.raise_notice(text=f"Không tìm thấy bài báo nào!")
+
 
     # Lấy danh sách các bài báo từ bộ dữ liệu ban đầu(bộ dữ liệu để tìm kiếm cộng tác)
     def getListPaper(self, flag):
@@ -665,6 +605,172 @@ class MainWindow(QtWidgets.QMainWindow):
             msg.setText(str(text))
         msg.setWindowTitle("Warning")
         msg.exec_()
+
+
+class NewWidgetPopup(QtWidgets.QMainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setWindowTitle("List Paper")
+        self.setGeometry(300, 150, 1000, 600)
+
+        self.centralwidget_popup = QtWidgets.QWidget(self)
+        self.centralwidget_popup.setObjectName("centralwidget_popup")
+        self.centralwidget_popup.setStyleSheet("background-color: rgb(220, 220, 220);")
+        self.centralwidget_popup.setGeometry(QtCore.QRect(0, 0, 1000, 600))
+
+        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget_popup)
+        self.scrollArea.setGeometry(QtCore.QRect(0, 0, 1000, 600))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1000, 600))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout.setObjectName("verticalLayout")
+
+    def init_table(self, author_base, author_cell):
+        self.lblSamePaper = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.lblSamePaper.setAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(70)
+        self.lblSamePaper.setFont(font)
+        self.lblSamePaper.setObjectName("lblSamePaper")
+        self.lblSamePaper.setText("BÀI BÁO GIỐNG NHAU")
+        self.verticalLayout.addWidget(self.lblSamePaper)
+
+        self.tblSamePaper = QtWidgets.QTableWidget(self.scrollAreaWidgetContents)
+        self.tblSamePaper.setEnabled(True)
+
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tblSamePaper.sizePolicy().hasHeightForWidth())
+        self.tblSamePaper.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setKerning(True)
+        self.tblSamePaper.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tblSamePaper.setFont(font)
+        self.tblSamePaper.setMinimumSize(QtCore.QSize(0, 200))
+        self.tblSamePaper.setMouseTracking(True)
+        self.tblSamePaper.setStyleSheet("selection-background-color: rgb(119, 162, 255);")
+        self.tblSamePaper.setDragEnabled(False)
+        self.tblSamePaper.setDragDropOverwriteMode(True)
+        self.tblSamePaper.setTextElideMode(QtCore.Qt.ElideRight)
+        self.tblSamePaper.setAutoScrollMargin(2)
+        self.tblSamePaper.setShowGrid(True)
+        self.tblSamePaper.setGridStyle(QtCore.Qt.SolidLine)
+        self.tblSamePaper.setWordWrap(True)
+        self.tblSamePaper.setCornerButtonEnabled(True)
+        self.tblSamePaper.setObjectName("tblSamePaper")
+        self.tblSamePaper.setColumnCount(2)
+        item = QtWidgets.QTableWidgetItem("STT")
+        self.tblSamePaper.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem("Tên bài báo")
+        self.tblSamePaper.setHorizontalHeaderItem(1, item)
+        self.tblSamePaper.horizontalHeader().setVisible(True)
+        self.tblSamePaper.horizontalHeader().setCascadingSectionResizes(True)
+        self.tblSamePaper.horizontalHeader().setHighlightSections(True)
+        self.tblSamePaper.horizontalHeader().setMinimumSectionSize(90)
+        self.tblSamePaper.horizontalHeader().setSortIndicatorShown(False)
+        self.tblSamePaper.horizontalHeader().setStretchLastSection(True)
+        self.tblSamePaper.verticalHeader().setVisible(False)
+        self.tblSamePaper.verticalHeader().setCascadingSectionResizes(False)
+        self.tblSamePaper.verticalHeader().setHighlightSections(False)
+        self.tblSamePaper.verticalHeader().setMinimumSectionSize(23)
+        self.tblSamePaper.verticalHeader().setSortIndicatorShown(False)
+        self.tblSamePaper.verticalHeader().setStretchLastSection(False)
+        self.tblSamePaper.setColumnWidth(0, 80)
+        self.tblSamePaper.setColumnWidth(1, 920)
+        self.verticalLayout.addWidget(self.tblSamePaper)
+
+        self.lblDifferencePaper = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.lblDifferencePaper.setAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(70)
+        self.lblDifferencePaper.setFont(font)
+        self.lblDifferencePaper.setObjectName("lblDifferencePaper")
+        self.lblDifferencePaper.setText("BÀI BÁO KHÁC NHAU")
+        self.verticalLayout.addWidget(self.lblDifferencePaper)
+
+        self.tblDifferencePaper = QtWidgets.QTableWidget(self.scrollAreaWidgetContents)
+        self.tblDifferencePaper.setEnabled(True)
+
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tblDifferencePaper.sizePolicy().hasHeightForWidth())
+        self.tblDifferencePaper.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setKerning(True)
+        self.tblDifferencePaper.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tblDifferencePaper.setFont(font)
+        self.tblDifferencePaper.setMinimumSize(QtCore.QSize(0, 500))
+        self.tblDifferencePaper.setMouseTracking(True)
+        self.tblDifferencePaper.setStyleSheet("selection-background-color: rgb(119, 162, 255);")
+        self.tblDifferencePaper.setDragEnabled(False)
+        self.tblDifferencePaper.setDragDropOverwriteMode(True)
+        self.tblDifferencePaper.setTextElideMode(QtCore.Qt.ElideRight)
+        self.tblDifferencePaper.setAutoScrollMargin(2)
+        self.tblDifferencePaper.setShowGrid(True)
+        self.tblDifferencePaper.setGridStyle(QtCore.Qt.SolidLine)
+        self.tblDifferencePaper.setWordWrap(True)
+        self.tblDifferencePaper.setCornerButtonEnabled(True)
+        self.tblDifferencePaper.setObjectName("tblDifferencePaper")
+        self.tblDifferencePaper.setColumnCount(3)
+        item = QtWidgets.QTableWidgetItem("STT")
+        self.tblDifferencePaper.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem(author_base)
+        self.tblDifferencePaper.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem(author_cell)
+        self.tblDifferencePaper.setHorizontalHeaderItem(2, item)
+        self.tblDifferencePaper.horizontalHeader().setVisible(True)
+        self.tblDifferencePaper.horizontalHeader().setCascadingSectionResizes(True)
+        self.tblDifferencePaper.horizontalHeader().setHighlightSections(True)
+        self.tblDifferencePaper.horizontalHeader().setMinimumSectionSize(90)
+        self.tblDifferencePaper.horizontalHeader().setSortIndicatorShown(False)
+        self.tblDifferencePaper.horizontalHeader().setStretchLastSection(True)
+        self.tblDifferencePaper.verticalHeader().setVisible(False)
+        self.tblDifferencePaper.verticalHeader().setCascadingSectionResizes(False)
+        self.tblDifferencePaper.verticalHeader().setHighlightSections(False)
+        self.tblDifferencePaper.verticalHeader().setMinimumSectionSize(23)
+        self.tblDifferencePaper.verticalHeader().setSortIndicatorShown(False)
+        self.tblDifferencePaper.verticalHeader().setStretchLastSection(False)
+        self.tblDifferencePaper.setColumnWidth(0, 80)
+        self.tblDifferencePaper.setColumnWidth(1, 460)
+        self.tblDifferencePaper.setColumnWidth(2, 460)
+        self.verticalLayout.addWidget(self.tblDifferencePaper)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+    def generate_data(self, data):
+        self.tblSamePaper.clearContents()
+        if data:
+            df = data['df']
+            if data['list_paper']:
+                self.tblSamePaper.setRowCount(len(data['list_paper']) + 1)
+                for index, value in enumerate(data['list_paper']):
+                    self.tblSamePaper.setItem(index, 0, QTableWidgetItem(str(index+1)))
+                    self.tblSamePaper.setItem(index, 1, QTableWidgetItem(str(value)))
+            if data['list_id']:
+                df = df.loc[~df['id'].isin(data['list_id'])]
+
+            self.tblDifferencePaper.clearContents()
+            self.tblDifferencePaper.setRowCount(data['max_row'] + 1)
+            index = index_1 = index_2 = 0
+            for _, row in df.iterrows():
+                self.tblDifferencePaper.setItem(index, 0, QTableWidgetItem(str(index + 1)))
+                author = str(row.author).split("|")
+                if any(i in author for i in data['author_base']):
+                    self.tblDifferencePaper.setItem(index_1, 1, QTableWidgetItem(str(row.title)))
+                    index_1 += 1
+                elif data['author_cell'] in author:
+                    self.tblDifferencePaper.setItem(index_2, 2, QTableWidgetItem(str(row.title)))
+                    index_2 += 1
+                index += 1
 
 
 if __name__ == "__main__":
