@@ -75,14 +75,87 @@ def group_cosine_similar(author_vt, group_author_vector, authors_name, top):
 class NewWidgetPopup(QtWidgets.QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
+        self.setWindowTitle("List Paper")
+        self.setGeometry(300, 150, 800, 450)
 
-        self.title = "Table"
-        self.top = 150
-        self.left = 300
-        self.width = 870
-        self.height = 500
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+    def init_table(self, author_base, author_cell):
+        self.centralwidget_popup = QtWidgets.QWidget(self)
+        self.centralwidget_popup.setObjectName("centralwidget_popup")
+        self.centralwidget_popup.setStyleSheet("background-color: rgb(220, 220, 220);")
+        self.centralwidget_popup.setGeometry(QtCore.QRect(0, 0, 800, 450))
+
+        self.tblComparePaper = QtWidgets.QTableWidget(self.centralwidget_popup)
+        self.tblComparePaper.setEnabled(True)
+        self.tblComparePaper.setGeometry(QtCore.QRect(0, 0, 800, 450))
+
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tblComparePaper.sizePolicy().hasHeightForWidth())
+        self.tblComparePaper.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setKerning(True)
+        self.tblComparePaper.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tblComparePaper.setFont(font)
+        self.tblComparePaper.setMouseTracking(True)
+        self.tblComparePaper.setStyleSheet("selection-background-color: rgb(119, 162, 255);")
+        self.tblComparePaper.setDragEnabled(False)
+        self.tblComparePaper.setDragDropOverwriteMode(True)
+        self.tblComparePaper.setTextElideMode(QtCore.Qt.ElideRight)
+        self.tblComparePaper.setShowGrid(True)
+        self.tblComparePaper.setGridStyle(QtCore.Qt.SolidLine)
+        self.tblComparePaper.setWordWrap(True)
+        self.tblComparePaper.setCornerButtonEnabled(True)
+        self.tblComparePaper.setObjectName("tblComparePaper")
+        self.tblComparePaper.setColumnCount(3)
+        item = QtWidgets.QTableWidgetItem("STT")
+        self.tblComparePaper.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem(author_base)
+        self.tblComparePaper.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem(author_cell)
+        self.tblComparePaper.setHorizontalHeaderItem(2, item)
+        self.tblComparePaper.horizontalHeader().setVisible(True)
+        self.tblComparePaper.horizontalHeader().setCascadingSectionResizes(True)
+        self.tblComparePaper.horizontalHeader().setHighlightSections(True)
+        self.tblComparePaper.horizontalHeader().setMinimumSectionSize(90)
+        self.tblComparePaper.horizontalHeader().setSortIndicatorShown(False)
+        self.tblComparePaper.horizontalHeader().setStretchLastSection(True)
+        self.tblComparePaper.verticalHeader().setVisible(False)
+        self.tblComparePaper.verticalHeader().setCascadingSectionResizes(False)
+        self.tblComparePaper.verticalHeader().setHighlightSections(False)
+        self.tblComparePaper.verticalHeader().setMinimumSectionSize(23)
+        self.tblComparePaper.verticalHeader().setSortIndicatorShown(False)
+        self.tblComparePaper.verticalHeader().setStretchLastSection(False)
+        self.tblComparePaper.setColumnWidth(0, 80)
+        self.tblComparePaper.setColumnWidth(1, 360)
+        self.tblComparePaper.setColumnWidth(2, 360)
+        self.tblComparePaper.setItem(0, 0, QTableWidgetItem("abc"))
+
+    def generate_data(self, data):
+        self.tblComparePaper.clearContents()
+        if data:
+            df = data['df']
+            if data['list_paper']:
+                self.tblComparePaper.setRowCount(len(data['list_paper']))
+                for index, value in enumerate(data['list_paper']):
+                    self.tblComparePaper.setItem(index, 0, QTableWidgetItem(str(index+1)))
+                    self.tblComparePaper.setItem(index, 1, QTableWidgetItem(str(value)))
+                    self.tblComparePaper.setItem(index, 2, QTableWidgetItem(str(value)))
+            if data['list_id']:
+                df = df.loc[~df['id'].isin(data['list_id'])]
+            self.tblComparePaper.setRowCount(data['max_row'] + len(data['list_paper']))
+            index = index_1 = index_2 = len(data['list_paper'])
+            for _, row in df.iterrows():
+                self.tblComparePaper.setItem(index, 0, QTableWidgetItem(str(index + 1)))
+                author = str(row.author).split("|")
+                if data['author_base'] in author:
+                    self.tblComparePaper.setItem(index_1, 1, QTableWidgetItem(str(row.title)))
+                    index_1 += 1
+                elif data['author_cell'] in author:
+                    self.tblComparePaper.setItem(index_2, 2, QTableWidgetItem(str(row.title)))
+                    index_2 += 1
+                index += 1
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -103,9 +176,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.author_vt = {}
         self.df = {}
-         
+
         self.author_vt_rcm = None
-        self.df_rcm = None 
+        self.df_rcm = None
 
         self.df_main = None # biến để lưu bộ dữ liệu đầy đủ (bộ dữ liệu để tìm kiếm trong việc thêm tác giả mới)
         self.all_author_list = set()
@@ -114,6 +187,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btTabImportData.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pImportData))
         self.ui.btChoose.clicked.connect(self.choose_path)
         self.ui.btLoad.clicked.connect(self.load)
+        self.ui.lblPath.setText("/Users/chutrieuchinh/Documents/pyqt5/data/output_article_10k_2.csv")
 
         # page 1: nhom cong tac tuong tu nhat
         self.ui.btTabNhomNguoiCongTac.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhat))
@@ -122,6 +196,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # page 1 new: nhom cong tac tuong tu nhat new
         self.ui.btTabNhomNguoiCongTacNew.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.pNhomCongTacTuongTuNhatNew))
+        self.ui.tblP1New.cellDoubleClicked.connect(self.show_item_new)
         self.ui.btSearchP1New.clicked.connect(self.getAuthorFromAuthorNew)
 
         # page 2: cong tac tuong tu nhat
@@ -147,10 +222,56 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def show_item(self):
-        print(f'row {self.ui.tblP1.currentRow()}')
-        print(f'column {self.ui.tblP1.currentColumn()}')
-
         self.newWidget = NewWidgetPopup()
+
+        current_df = self.df[self.ui.cbChooseTarget_1.currentText()]
+        author_base = self.ui.lTacGiaP1.text()
+        author_cell = self.ui.tblP1.currentItem().text()
+        df_paper_base = self.filterPaperByAuthor(current_df, author_base)
+        df_paper_cell = self.filterPaperByAuthor(current_df, author_cell)
+        merge_df = df_paper_base.append(df_paper_cell)
+        same_df = merge_df[merge_df.duplicated(["title"])]
+        list_same_paper = []
+        list_same_id = []
+        if not same_df.empty:
+            list_same_paper = same_df['title'].values.tolist()
+            list_same_id = same_df['id'].values.tolist()
+        data = {
+            'max_row': max(len(df_paper_base.index), len(df_paper_cell.index)) - len(list_same_id),
+            'author_base': author_base,
+            'author_cell': author_cell,
+            'df': merge_df,
+            'list_paper': list_same_paper,
+            'list_id': list_same_id
+        }
+        self.newWidget.init_table(author_base, author_cell)
+        self.newWidget.generate_data(data)
+        self.newWidget.show()
+
+    def show_item_new(self):
+        self.newWidget = NewWidgetPopup()
+        target_df = self.df[self.ui.cbChooseTarget_1_new.currentText()]
+        author_base = self.ui.lTacGiaP1New.text()
+        author_cell = self.ui.tblP1New.currentItem().text()
+        df_paper_base = self.filterPaperByAuthor(target_df, author_base)
+        df_paper_cell = self.filterPaperByAuthor(target_df, author_cell)
+        merge_df = df_paper_base.append(df_paper_cell)
+        same_df = merge_df[merge_df.duplicated(["title"])]
+        list_same_paper = []
+        list_same_id = []
+        if not same_df.empty:
+            list_same_paper = same_df['title'].values.tolist()
+            list_same_id = same_df['id'].values.tolist()
+        data = {
+            'max_row': max(len(df_paper_base.index), len(df_paper_cell.index)) - len(list_same_id),
+            'author_base': author_base,
+            'author_cell': author_cell,
+            'df': merge_df,
+            'list_paper': list_same_paper,
+            'list_id': list_same_id
+        }
+        self.newWidget.init_table(author_base, author_cell)
+        self.newWidget.generate_data(data)
         self.newWidget.show()
 
     # lấy Danh sách tác giả từ dữ liệu mới
@@ -163,7 +284,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 return 0
         df_new = pd.read_csv(path_new_data, encoding='latin1')
         if flag == 1:
-
             if self.nextP4 + 9 < df_new.shape[0]:
                 self.reVertP4 = self.reVertP4 + 10
                 self.nextP4 = self.nextP4 + 10
@@ -475,6 +595,18 @@ class MainWindow(QtWidgets.QMainWindow):
     #         current_df = self.df[df_key]
     #         list_author = current_df.loc[current_df['author']]
 
+    # Lọc bài báo theo tác giả
+    def filterPaperByAuthor(self, df, author):
+        indexs = []
+        authors = df['author']
+        for item in authors.iteritems():
+            if isinstance(item[1], str) and author in item[1].split('|'):
+                indexs.append(item[0])
+        df = df.iloc[indexs, :]
+        if not df.empty:
+            return df
+        self.raise_notice(text=f"Không tìm thấy bài báo với tác giả {author}")
+
     # Lấy danh sách các bài báo từ bộ dữ liệu ban đầu(bộ dữ liệu để tìm kiếm cộng tác)
     def getListPaper(self, flag):
         df_key = str(self.ui.cbChooseTarget_3.currentText())
@@ -491,12 +623,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if search_type == 0:
                     current_df = current_df.loc[search_data == current_df['title']]
                 elif search_type == 1:
-                    indexs = []
-                    a = current_df['author']
-                    for item in a.iteritems():
-                        if search_data in item[1].split('|'):
-                            indexs.append(item[0])
-                    current_df = current_df.iloc[indexs, :]
+                    current_df = self.filterPaperByAuthor(current_df, search_data)
             if flag == 1:
                 if self.nextP3 + 9 < current_df.shape[0]:
                     self.reVertP3 = self.reVertP3 + 10

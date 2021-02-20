@@ -80,7 +80,7 @@ class Ui_MainWindow(object):
         self.lblPath.setFont(font)
         self.lblPath.setMouseTracking(False)
         self.lblPath.setText("")
-        self.lblPath.setReadOnly(True)
+        self.lblPath.setReadOnly(False)
         self.lblPath.setObjectName("lblPath")
 
         self.btChoose = QtWidgets.QPushButton(self.widget)
