@@ -1,4 +1,4 @@
- ##**ỨNG DỤNG KHUYẾN NGHỊ CỘNG TÁC**
+ **ỨNG DỤNG KHUYẾN NGHỊ CỘNG TÁC**
 #### Python with PyQT5
 **Màn hình 1: Import data**
 1. Chọn đường dẫn, sau đó nạp dữ liệu
